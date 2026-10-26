@@ -1,0 +1,19 @@
+# Example only. Review and adapt before enabling publicly.
+# Caddy handles TLS and serves the static Vite build.
+voqryn.com {
+    root * /srv/voqryn/web/dist
+
+    @api path /v1 /v1/* /healthz
+    handle @api {
+        reverse_proxy 127.0.0.1:8000 {
+            # Explicitly replace client-provided forwarding information.
+            header_up X-Forwarded-For {remote_host}
+            header_up X-Real-IP {remote_host}
+            header_up -Forwarded
+        }
+    }
+
+    handle {
+        file_server
+    }
+}
