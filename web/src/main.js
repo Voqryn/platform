@@ -28,7 +28,7 @@ document.querySelector('#lookup').addEventListener('submit', async (event) => {
   event.preventDefault();
   const domain = document.querySelector('#domain').value.trim().toLowerCase().replace(/\\.$/, '');
   if (!safeDomain(domain)) { result.textContent = 'Enter a valid fully qualified domain name.'; return; }
-  const path = tool === 'dns' ? '/v1/dns/lookup' : '/v1/rdap/domain';
+  const path = tool === 'dns' ? '/v1/dns/lookup' : '/v1/domain/check';
   const url = endpoint(path);
   url.searchParams.set('domain', domain);
   if (tool === 'dns') url.searchParams.set('record_type', record.value);
@@ -42,8 +42,8 @@ document.querySelector('#lookup').addEventListener('submit', async (event) => {
     if (tool === 'dns') {
       result.textContent = payload.records?.length ? payload.records.join('\\n') : 'No records returned.';
     } else {
-      const name = payload.rdap?.ldhName || domain;
-      result.textContent = 'RDAP record found for ' + name + '. This does not indicate current purchase availability.\\n' + JSON.stringify(payload.rdap, null, 2);
+      const labels = { registered: 'Registered', possibly_available: 'Possibly available (not guaranteed)', unknown: 'Unknown' };
+      result.textContent = domain + ': ' + (labels[payload.status] || 'Unknown') + '\\n' + (payload.disclaimer || '');
     }
     document.querySelector('#monitor-link').href = '/monitoring/?domain=' + encodeURIComponent(domain);
     cta.hidden = false;
