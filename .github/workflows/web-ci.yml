@@ -1,5 +1,6 @@
 name: Web CI
 on:
+  workflow_dispatch:
   push:
     paths: ['web/**', '.github/workflows/web-ci.yml']
   pull_request:
